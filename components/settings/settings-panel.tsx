@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   CheckCircle2,
+  Cloud,
   Database,
   ExternalLink,
   HardDrive,
@@ -13,6 +14,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
+import { DeployRenderButton } from "@/components/ui/deploy-render-button";
 import { GlassPanel } from "@/components/ui/glass-panel";
 
 type Health = {
@@ -126,6 +128,17 @@ export function SettingsPanel() {
         >
           Read privacy policy <ExternalLink className="size-3" />
         </Link>
+      </SettingGroup>
+      <SettingGroup
+        icon={Cloud}
+        title="Deploy"
+        description="Launch your own Auralis instance from the repository Blueprint."
+      >
+        <p className="text-sm leading-6 text-white/45">
+          Creates one free Render Web Service in mock fallback mode. Optional
+          PostgreSQL and YouTube API credentials can be added later.
+        </p>
+        <DeployRenderButton className="mt-3 w-full sm:w-auto" />
       </SettingGroup>
       <SettingGroup
         icon={Info}

@@ -1,5 +1,7 @@
 # Auralis
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Astear17/Auralis)
+
 Auralis is a polished, legal music web app built with Next.js App Router. It combines a rich mock discovery catalog, an official visible YouTube IFrame player, and private playback for user-owned local audio.
 
 ## Highlights
@@ -66,16 +68,18 @@ npm run prisma:migrate
 
 ## Render Deployment
 
-The included `render.yaml` configures Auralis as one Render Web Service.
+Click the button below to create Auralis as one free Render Web Service:
 
-1. Push this repository to GitHub.
-2. In Render, create a new Blueprint and select the repository, or create a Node Web Service manually.
-3. Use `npm ci && npm run build` as the build command and `npm run start` as the start command.
-4. Add `DATABASE_URL` from an optional Render PostgreSQL database.
-5. Add `YOUTUBE_API_KEY` only if official metadata lookup is desired.
-6. Set the health check path to `/api/health`.
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Astear17/Auralis)
 
-The app remains functional in mock fallback mode when PostgreSQL or the YouTube API key is absent.
+The included `render.yaml` explicitly configures every web service on the `free` plan. It deploys immediately in mock fallback mode without requiring environment variables.
+
+1. Click **Deploy to Render**.
+2. Sign in to Render and review the Blueprint.
+3. Click **Deploy Blueprint**.
+4. Optionally add `DATABASE_URL` or `YOUTUBE_API_KEY` to the deployed service later.
+
+The free web service spins down after inactivity and is intended for hobby or preview use. Auto-deploy is disabled so changes to the template repository do not redeploy every instance created from the button.
 
 ## Playback Sources and Legal Limitations
 
