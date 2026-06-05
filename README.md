@@ -13,12 +13,12 @@ Auralis is a polished, legal music web app built with Next.js App Router. It com
 - Local audio, optional cover image, metadata, and LRC storage in browser IndexedDB
 - Search, discovery, library, album, artist, playlist, settings, privacy, and player routes
 - Zod-validated API routes with safe mock fallback
-- Optional PostgreSQL via Prisma and optional official YouTube Data API metadata
+- PostgreSQL persistence via Prisma on Render, with a safe local mock fallback
 - Basic installable PWA manifest and service worker
 
 ## Local Development
 
-Requirements: Node.js 20+ and npm.
+Requirements: Node.js 24 and npm.
 
 ```bash
 npm install
@@ -34,13 +34,20 @@ Open [http://localhost:3000](http://localhost:3000). Auralis runs in complete mo
 DATABASE_URL=
 YOUTUBE_API_KEY=
 NEXT_PUBLIC_APP_NAME=Auralis
+NEXT_PUBLIC_APP_MODE=development
+APP_SECRET=
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=http://localhost:3000
 ```
 
 - `DATABASE_URL`: optional PostgreSQL connection string. Without it, APIs return polished mock data and validated non-persistent fallback responses.
 - `YOUTUBE_API_KEY`: optional key used only by `/api/youtube/metadata` through the official YouTube Data API.
 - `NEXT_PUBLIC_APP_NAME`: optional public application name.
+- `NEXT_PUBLIC_APP_MODE`: deployment label exposed by `/api/health`.
+- `APP_SECRET` and `NEXTAUTH_SECRET`: reserved application secrets generated automatically by Render.
+- `NEXTAUTH_URL`: canonical app URL. Update it if you rename the Render web service.
 
-For PostgreSQL:
+For local PostgreSQL, set `DATABASE_URL`, then create or apply migrations:
 
 ```bash
 npm run prisma:generate
@@ -53,6 +60,10 @@ Production deployments run migrations with:
 npm run prisma:migrate
 ```
 
+`npm run render:build` mirrors the Render build process. It generates Prisma,
+applies committed migrations when `DATABASE_URL` is set, and safely skips the
+migration step when the app is running in local mock fallback mode.
+
 ## Commands
 
 ```bash
@@ -64,22 +75,46 @@ npm run start
 npm run format
 npm run prisma:generate
 npm run prisma:migrate
+npm run render:build
 ```
 
 ## Render Deployment
 
-Click the button below to create Auralis as one free Render Web Service:
+Click the button below to create the complete Auralis Blueprint:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Astear17/Auralis)
 
-The included `render.yaml` explicitly configures every web service on the `free` plan. It deploys immediately in mock fallback mode without requiring environment variables.
+The included `render.yaml` provisions:
+
+- `auralis-web`: one Singapore Render Web Service on the free plan
+- `auralis-db`: one Singapore Render PostgreSQL database on the free plan
+- Automatic private `DATABASE_URL` binding from the database to the web service
+- Generated `APP_SECRET` and `NEXTAUTH_SECRET` values
+- An optional `YOUTUBE_API_KEY` prompt
+- `/api/health` health checks and automatic committed Prisma migrations
 
 1. Click **Deploy to Render**.
 2. Sign in to Render and review the Blueprint.
-3. Click **Deploy Blueprint**.
-4. Optionally add `DATABASE_URL` or `YOUTUBE_API_KEY` to the deployed service later.
+3. Optionally enter a YouTube Data API key, or leave it blank.
+4. Click **Deploy Blueprint**.
 
-The free web service spins down after inactivity and is intended for hobby or preview use. Auto-deploy is disabled so changes to the template repository do not redeploy every instance created from the button.
+The web service builds with `npm run render:build`, which generates Prisma,
+runs `prisma migrate deploy` against the automatically bound PostgreSQL
+database, and builds Next.js. Auto-deploy is disabled so each deployed instance
+stays under its owner's control.
+
+If you rename `auralis-web`, update `NEXTAUTH_URL` in the Render dashboard to
+the new public URL. The current app does not collect passwords or YouTube
+credentials; the generated secrets reserve a secure foundation for future
+authenticated features.
+
+Render free web services spin down after 15 minutes without inbound traffic.
+Render free PostgreSQL databases expire 30 days after creation, and each
+workspace can have only one active free database. Use a paid database or export
+data before expiry for a long-lived deployment. See
+[Render's free instance limits](https://render.com/free) for current details.
+Local development still works without PostgreSQL through Auralis's mock
+fallback.
 
 ## Playback Sources and Legal Limitations
 

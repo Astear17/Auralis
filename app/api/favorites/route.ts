@@ -1,43 +1,47 @@
 import { ok, badRequest } from "@/lib/api";
-import { db } from "@/lib/db";
+import { runDatabase } from "@/lib/db";
 import { favoriteSchema, parseJson } from "@/lib/validators";
 
 export async function POST(request: Request) {
   const parsed = await parseJson(request, favoriteSchema);
   if (parsed.error) return badRequest(parsed.error);
-  if (db) {
-    try {
-      const favorite = await db.favorite.upsert({
-        where: {
-          userKey_trackId: {
-            userKey: "local-user",
-            trackId: parsed.data.trackId,
-          },
+  const database = await runDatabase("save favorite", (client) =>
+    client.favorite.upsert({
+      where: {
+        userKey_trackId: {
+          userKey: "local-user",
+          trackId: parsed.data.trackId,
         },
-        update: {},
-        create: { userKey: "local-user", trackId: parsed.data.trackId },
-      });
-      return ok({ data: favorite, persisted: true });
-    } catch {}
+      },
+      update: {},
+      create: { userKey: "local-user", trackId: parsed.data.trackId },
+    }),
+  );
+  if (database.ok) {
+    return ok({ data: database.data, persisted: true });
   }
-  return ok({ data: parsed.data, persisted: false });
+  return ok({
+    data: parsed.data,
+    persisted: false,
+    database: database.reason,
+  });
 }
 
 export async function DELETE(request: Request) {
   const parsed = await parseJson(request, favoriteSchema);
   if (parsed.error) return badRequest(parsed.error);
-  if (db) {
-    try {
-      await db.favorite.delete({
-        where: {
-          userKey_trackId: {
-            userKey: "local-user",
-            trackId: parsed.data.trackId,
-          },
+  const database = await runDatabase("delete favorite", (client) =>
+    client.favorite.delete({
+      where: {
+        userKey_trackId: {
+          userKey: "local-user",
+          trackId: parsed.data.trackId,
         },
-      });
-      return ok({ deleted: true, persisted: true });
-    } catch {}
+      },
+    }),
+  );
+  if (database.ok) {
+    return ok({ deleted: true, persisted: true });
   }
-  return ok({ deleted: true, persisted: false });
+  return ok({ deleted: true, persisted: false, database: database.reason });
 }

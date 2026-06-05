@@ -2,6 +2,9 @@
   "name": "auralis",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=24.15.0 <25"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,6 +14,7 @@
     "format": "prettier --write .",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
+    "render:build": "node scripts/render-build.mjs",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -40,7 +44,8 @@
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.8",
+    "yaml": "^2.9.0"
   },
   "overrides": {
     "postcss": "8.5.15"

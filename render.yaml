@@ -1,15 +1,43 @@
 services:
   - type: web
-    name: auralis
+    name: auralis-web
     runtime: node
     plan: free
+    region: singapore
     numInstances: 1
-    autoDeploy: false
-    buildCommand: npm ci && npm run build
+    autoDeployTrigger: "off"
+    # Free web services do not support pre-deploy commands, so render:build
+    # applies committed Prisma migrations before compiling Next.js.
+    buildCommand: npm ci --include=dev && npm run render:build
     startCommand: npm run start
     healthCheckPath: /api/health
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: NODE_VERSION
         value: 24.15.0
       - key: NEXT_PUBLIC_APP_NAME
         value: Auralis
+      - key: NEXT_PUBLIC_APP_MODE
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: auralis-db
+          property: connectionString
+      - key: APP_SECRET
+        generateValue: true
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: NEXTAUTH_URL
+        value: https://auralis-web.onrender.com
+      - key: YOUTUBE_API_KEY
+        sync: false
+
+databases:
+  - name: auralis-db
+    databaseName: auralis
+    user: auralis
+    plan: free
+    region: singapore
+    # Use Render's private network connection string only.
+    ipAllowList: []

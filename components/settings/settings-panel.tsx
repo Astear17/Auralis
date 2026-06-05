@@ -135,8 +135,9 @@ export function SettingsPanel() {
         description="Launch your own Auralis instance from the repository Blueprint."
       >
         <p className="text-sm leading-6 text-white/45">
-          Creates one free Render Web Service in mock fallback mode. Optional
-          PostgreSQL and YouTube API credentials can be added later.
+          Creates a free Render Web Service and PostgreSQL database, binds them
+          automatically, runs Prisma migrations, and optionally accepts a
+          YouTube Data API key.
         </p>
         <DeployRenderButton className="mt-3 w-full sm:w-auto" />
       </SettingGroup>

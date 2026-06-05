@@ -23,10 +23,11 @@ export default function PrivacyPage() {
           lyrics are stored in IndexedDB and are not uploaded by the default
           app.
         </Section>
-        <Section title="Optional PostgreSQL">
-          When a deployer configures `DATABASE_URL`, Auralis can store
-          application records such as playlists, favorites, history, and lyrics.
-          The included mock fallback works without a database.
+        <Section title="PostgreSQL and mock fallback">
+          The Render Blueprint provisions PostgreSQL and binds `DATABASE_URL`
+          automatically. Auralis can store application records such as
+          playlists, favorites, history, and lyrics there. Local development
+          still works without a database through the included mock fallback.
         </Section>
         <Section title="YouTube embeds">
           YouTube mode uses the official visible IFrame Player API. YouTube may

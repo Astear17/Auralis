@@ -1,20 +1,21 @@
-import { db, databaseConfigured } from "@/lib/db";
+import { databaseConfigured, getDatabaseStatus } from "@/lib/db";
 import { ok } from "@/lib/api";
 
 export async function GET() {
-  let database = databaseConfigured ? "configured" : "mock fallback";
-  if (db) {
-    try {
-      await db.$queryRaw`SELECT 1`;
-      database = "connected";
-    } catch {
-      database = "configured but unavailable";
-    }
-  }
+  const database = await getDatabaseStatus();
+  const mode =
+    database === "connected"
+      ? "database + fallback"
+      : database === "configured but unavailable"
+        ? "database unavailable, mock fallback active"
+        : "mock fallback";
+
   return ok({
     status: "healthy",
-    mode: databaseConfigured ? "database + fallback" : "mock fallback",
+    mode,
     database,
+    databaseConfigured,
+    deployment: process.env.RENDER ? "render" : "local",
     youtubeApi: process.env.YOUTUBE_API_KEY ? "configured" : "not configured",
     timestamp: new Date().toISOString(),
   });
